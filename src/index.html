@@ -126,7 +126,7 @@
 
         // Compile & Execute the code
         socket.emit("compile", code, (success, message) => {
-            if (!success) insertOutputLine(message);
+            insertOutputLine(message);
             changeButtonState(1);
         });
 
@@ -143,16 +143,18 @@
 
 
     function insertOutputLine(data) {
-        const prevItem = ioContainer.lastElementChild;
-        if (prevItem && !prevItem.value) {
-            prevItem.value = data;
-            prevItem.readOnly = true;
-        } else {
-            const inputElement = document.createElement("input");
-            inputElement.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
-            inputElement.readOnly = true;
-            inputElement.value = data;
-            ioContainer.appendChild(inputElement);
+        if (data) {
+            const prevItem = ioContainer.lastElementChild;
+            if (prevItem && !prevItem.value) {
+                prevItem.value = data;
+                prevItem.readOnly = true;
+            } else {
+                const inputElement = document.createElement("input");
+                inputElement.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
+                inputElement.readOnly = true;
+                inputElement.value = data;
+                ioContainer.appendChild(inputElement);
+            }
         }
         const nextItem = document.createElement("input");
         nextItem.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
@@ -163,6 +165,7 @@
                 e.preventDefault();
                 nextItem.readOnly = true;
                 socket.emit("userInput", nextItem.value);
+                insertOutputLine();
             }
         })
 
