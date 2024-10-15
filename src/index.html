@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css" integrity="sha512-gFMl3u9d0xt3WR8ZeW05MWm3yZ+ZfgsBVXLSOiFz2xeVrZ8Neg0+V1kkRIo9LikyA/T9HuS91kDfc2XWse0K0A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Online C - Compiler</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --sb-track-color: #232E33;
+            --sb-thumb-color: #51535f;
+            --sb-size: 8px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            width: 100%;
+            background: #282a36;
+            color: white;
+        }
+        .CodeMirror {
+            flex: 1;
+            height: 100%;
+            padding: 12px 0;
+            font-size: 16px;
+        }
+        .CodeMirror-lines {
+            padding: 0;
+        }
+        *::-webkit-scrollbar {
+            width: var(--sb-size)
+        }
+
+        *::-webkit-scrollbar-track {
+            background: var(--sb-track-color);
+            border-radius: 16px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: var(--sb-thumb-color);
+            border-radius: 16px;
+
+        }
+
+        @supports not selector(::-webkit-scrollbar) {
+            * {
+                scrollbar-color: var(--sb-thumb-color)
+                var(--sb-track-color);
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+<nav class="sticky top-0 left-0 w-full z-10 flex justify-between px-6 py-4 border-b border-b-slate-700 font-poppins">
+    <h1 class="text-2xl font-semibold">Online C Compiler</h1>
+    <button id="btn-run" class="flex items-center gap-2 text-sm bg-green-500 px-4 py-2 rounded disabled:bg-green-600 disabled:cursor-not-allowed">
+        <svg aria-hidden="true" class="hidden size-4 text-white/40 animate-spin fill-white" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+        </svg>
+        Run
+    </button>
+</nav>
+<div class="flex-1 flex w-full overflow-hidden">
+    <textarea class="overflow-y-auto" id="editor"></textarea>
+    <div id="io-container" class="flex-1 flex flex-col gap-1 border-l border-l-slate-700 p-3 font-mono">
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
+        integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/clike/clike.min.js" integrity="sha512-l8ZIWnQ3XHPRG3MQ8+hT1OffRSTrFwrph1j1oc1Fzc9UKVGef5XN9fdO0vm3nW0PRgQ9LJgck6ciG59m69rvfg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/search/match-highlighter.min.js" integrity="sha512-94h/nzerPpLt9vsOyZmNNemwyUESYD/Tnuem6b67+RQMETNFhH8pTCHLDZkGNhzEbmKO0AidJgS0aYH1mH9YfA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/anyword-hint.min.js" integrity="sha512-wdYOcbX/zcS4tP3HEDTkdOI5UybyuRxJMQzDQIRcafRLY/oTDWyXO+P8SzuajQipcJXkb2vHcd1QetccSFAaVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+<script>
+    const textareaEditor = document.getElementById("editor");
+    const ioContainer = document.getElementById("io-container");
+    const btnRun = document.getElementById("btn-run");
+    const circularProgress = document.querySelector("#btn-run svg");
+
+    const editor = CodeMirror.fromTextArea(textareaEditor, {
+        mode: "text/x-csrc",
+        lineNumbers: true,
+        theme: "dracula",
+        height: "100%",
+        indentUnit: 4,
+        matchBrackets: true,
+    });
+
+    editor.setValue(`#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!");\n\treturn 0;\n}`);
+
+
+    const socket = io();
+    socket.on("connect", () => {
+        console.log("Connected to websocket server");
+    });
+
+
+    btnRun.addEventListener("click", () => {
+        const code = editor.getValue();
+
+        // Resetting UI States
+        changeButtonState(0);
+        ioContainer.innerHTML = "";
+
+        // Compile & Execute the code
+        socket.emit("compile", code, (success, message) => {
+            if (!success) insertOutputLine(message);
+            changeButtonState(1);
+        });
+
+        socket.on("output", (data) => {
+            insertOutputLine(data);
+        });
+
+
+
+        socket.on("userInputRequired", (required) => {
+            console.log(required);
+        });
+    });
+
+
+    function insertOutputLine(data) {
+        const prevItem = ioContainer.lastElementChild;
+        if (prevItem && !prevItem.value) {
+            prevItem.value = data;
+            prevItem.readOnly = true;
+        } else {
+            const inputElement = document.createElement("input");
+            inputElement.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
+            inputElement.readOnly = true;
+            inputElement.value = data;
+            ioContainer.appendChild(inputElement);
+        }
+        const nextItem = document.createElement("input");
+        nextItem.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
+        nextItem.value = "";
+        nextItem.addEventListener("keyup", (e) => {
+            console.log(e.key);
+            if (e.key === "Enter") {
+                e.preventDefault();
+                nextItem.readOnly = true;
+                socket.emit("userInput", nextItem.value);
+            }
+        })
+
+        ioContainer.appendChild(nextItem);
+        nextItem.focus();
+    }
+
+    function changeButtonState(state) {
+        if (state === 0) {
+            btnRun.disabled = true;
+            circularProgress.classList.toggle("hidden");
+        } else {
+            btnRun.disabled = false;
+            circularProgress.classList.toggle("hidden");
+        }
+    }
+
+</script>
+</body>
+</html>
