@@ -24,6 +24,7 @@ io.on("connection", (socket) => {
     console.log("User connected");
 
     socket.on("compile", (code, cb) => {
+
         const filename = Math.random().toString(36).slice(2, 6);
         const inputFilepath = path.join(__dirname, "tmp", filename + ".c");
         const outputFilepath = path.join(__dirname, "tmp", filename);
@@ -45,15 +46,13 @@ io.on("connection", (socket) => {
                 cb(true, "Compilation succeeded");
 
                 // Execute the compiled code
-                const spawnedProcess = spawn(outputFilepath + ".exe");
+                const spawnedProcess = spawn(outputFilepath);
 
                 spawnedProcess.stdout.on("data", (data) => {
-                    console.log(data.toString());
                     socket.emit("output", data.toString());
                 });
 
                 spawnedProcess.stderr.on("data", (error) => {
-                    console.log(error.toString());
                     socket.emit("output", error.toString());
                 });
 
@@ -63,14 +62,18 @@ io.on("connection", (socket) => {
                     }
                 });
 
-                spawnedProcess.on("exit", () => {
+                spawnedProcess.on("exit", (code) => {
+                    if (code !== 0) {
+                        socket.emit("output", stderr.toString());
+                    } else {
+                        socket.emit("output", "==== Program finished ====");
+                    }
                     try {
                         fs.unlinkSync(inputFilepath);
                         fs.unlinkSync(outputFilepath + ".exe");
                     } catch (error) {
                         console.log(error);
                     }
-                    socket.emit("output", "==== Program finished ====");
                 });
 
             });
