@@ -21,11 +21,9 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-
-    console.log(`Someone connected ${socket.id}`);
+    console.log("User connected");
 
     socket.on("compile", (code, cb) => {
-
         const filename = Math.random().toString(36).slice(2, 6);
         const inputFilepath = path.join(__dirname, "tmp", filename + ".c");
         const outputFilepath = path.join(__dirname, "tmp", filename);
