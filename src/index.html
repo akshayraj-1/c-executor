@@ -83,7 +83,7 @@
 </nav>
 <div class="flex-1 flex w-full overflow-hidden">
     <textarea class="overflow-y-auto" id="editor"></textarea>
-    <div id="io-container" class="flex-1 flex flex-col gap-1 border-l border-l-slate-700 p-3 font-mono">
+    <div id="io-container" contenteditable="true" class="flex-1 flex flex-col gap-1 border-l border-l-slate-700 outline-none p-3 font-mono">
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
@@ -143,35 +143,17 @@
 
 
     function insertOutputLine(data) {
-        if (data) {
-            const prevItem = ioContainer.lastElementChild;
-            if (prevItem && !prevItem.value) {
-                prevItem.value = data;
-                prevItem.readOnly = true;
-            } else {
-                const inputElement = document.createElement("input");
-                inputElement.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
-                inputElement.readOnly = true;
-                inputElement.value = data;
-                ioContainer.appendChild(inputElement);
-            }
-        }
-        const nextItem = document.createElement("input");
-        nextItem.classList.add("bg-transparent", "outline-none", "border-none", "w-full");
-        nextItem.value = "";
-        nextItem.addEventListener("keyup", (e) => {
-            console.log(e.key);
-            if (e.key === "Enter") {
-                e.preventDefault();
-                nextItem.readOnly = true;
-                socket.emit("userInput", nextItem.value);
-                insertOutputLine();
-            }
-        })
-
-        ioContainer.appendChild(nextItem);
-        nextItem.focus();
+        if (!data) return;
+        ioContainer.innerHTML += `<span contenteditable="false">${data}</span><br>`
     }
+
+    ioContainer.addEventListener("keyup", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            insertOutputLine(event.target.innerText);
+            socket.emit("userInput", event.target.innerText);
+        }
+    });
 
     function changeButtonState(state) {
         if (state === 0) {

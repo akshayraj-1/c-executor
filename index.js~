@@ -13,6 +13,8 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e8,
 });
 
+const decoder = new TextDecoder("utf-8");
+
 app.use(express.static("public"));
 app.use(express.json());
 
@@ -50,8 +52,8 @@ io.on("connection", (socket) => {
                 const spawnedProcess = spawn(outputFilepath + ".exe");
 
                 spawnedProcess.stdout.on("data", (data) => {
-                    console.log(data.toString());
-                    socket.emit("output", data.toString());
+                    console.log(decoder.decode(data));
+                    socket.emit("output", decoder.decode(data));
                 });
 
                 spawnedProcess.stderr.on("data", (error) => {
