@@ -25,11 +25,14 @@ io.on("connection", (socket) => {
 
     socket.on("compile", (code, cb) => {
 
+        const modifiedCode = code.replace(/(printf\(.*?\);)/g, '$1 fflush(stdout);')
+        console.log(modifiedCode);
+
         const filename = Math.random().toString(36).slice(2, 6);
         const inputFilepath = path.join(__dirname, "tmp", filename + ".c");
         const outputFilepath = path.join(__dirname, "tmp", filename);
 
-        fs.writeFile(inputFilepath, code, (error) => {
+        fs.writeFile(inputFilepath, modifiedCode, (error) => {
             if (error) {
                 cb(false, "Error: " + error);
                 return;
@@ -49,11 +52,11 @@ io.on("connection", (socket) => {
                 const spawnedProcess = spawn(outputFilepath);
 
                 spawnedProcess.stdout.on("data", (data) => {
-                    socket.emit("output", data.toString());
+                    socket.emit("output", data.toString() + "\n");
                 });
 
                 spawnedProcess.stderr.on("data", (error) => {
-                    socket.emit("output", error.toString());
+                    socket.emit("output", error.toString() + "\n");
                 });
 
                 socket.on("userInput", (input) => {
@@ -64,7 +67,7 @@ io.on("connection", (socket) => {
 
                 spawnedProcess.on("exit", (code) => {
                     if (code !== 0) {
-                        socket.emit("output", stderr.toString());
+                        socket.emit("output", `==== Program exited with code ${code} ====`);
                     } else {
                         socket.emit("output", "==== Program finished ====");
                     }
