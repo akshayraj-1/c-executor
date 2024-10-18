@@ -13,6 +13,8 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e8,
 });
 
+fs.mkdirSync("tmp", { recursive: true });
+
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "src/index.html"));
 });
