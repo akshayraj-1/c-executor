@@ -47,6 +47,9 @@
         .CodeMirror-lines {
             padding: 0;
         }
+        #io-container {
+            white-space: pre-wrap;
+        }
         *::-webkit-scrollbar {
             width: var(--sb-size)
         }
@@ -127,6 +130,7 @@
         changeButtonState(0);
         ioContainer.innerHTML = "";
 
+        socket.off("output");
         // Compile & Execute the code
         socket.emit("compile", code, (success, message) => {
             insertOutputLine(message);
