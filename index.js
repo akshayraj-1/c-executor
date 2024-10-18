@@ -4,7 +4,7 @@ const fs = require("fs");
 
 const http = require("http");
 const express = require("express");
-const { Server } = require("socket.io");
+const {Server} = require("socket.io");
 
 const PORT = 3000;
 const app = express();
@@ -13,22 +13,28 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e8,
 });
 
-fs.mkdirSync("tmp", { recursive: true });
-
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "src/index.html"));
 });
 
-app.get("/data/*" , (req, res) => {
+app.get("/data/*", (req, res) => {
     res.sendFile(path.join(__dirname, req.url));
 });
 
 io.on("connection", (socket) => {
+
     console.log("User connected:", socket.id);
+
+    let spawnedProcess = null;
+
     socket.on("compile", (code, cb) => {
 
+        if (spawnedProcess) {
+            spawnedProcess.kill("SIGINT");
+            spawnedProcess = null;
+        }
+
         const modifiedCode = code.replace(/(printf\(.*?\);|putchar\(.*?\);|puts\(.*?\);)/g, '$1 fflush(stdout);');
-        console.log(modifiedCode);
 
         const filename = Math.random().toString(36).slice(2, 6);
         const inputFilepath = path.join(__dirname, "tmp", filename + ".c");
@@ -48,10 +54,10 @@ io.on("connection", (socket) => {
                     return;
                 }
 
-                cb(true, inputFilepath.replaceAll(__dirname, ""));
+                cb(true, inputFilepath.toString().replace(__dirname, ''));
 
                 // Execute the compiled code
-                const spawnedProcess = spawn(outputFilepath);
+                spawnedProcess = spawn(outputFilepath);
 
                 spawnedProcess.stdout.on("data", (data) => {
                     socket.emit("output", data.toString());
@@ -65,36 +71,35 @@ io.on("connection", (socket) => {
                     socket.emit("output",
                         code !== 0
                             ? `==== Program exited with code ${code} ====`
-                            :  `=== Program finished ====`
+                            : `=== Program finished ====`
                     );
                     try {
                         fs.unlinkSync(inputFilepath);
-                        fs.unlinkSync(outputFilepath + ".exe");
+                        fs.unlinkSync(outputFilepath);
                     } catch (error) {
                         console.log(error);
                     }
                 });
+
+                socket.removeAllListeners("userInput");
 
                 socket.on("userInput", (input) => {
                     console.log(input);
-                    if (spawnedProcess.stdin) {
+                    if (spawnedProcess && spawnedProcess.stdin.writable) {
                         spawnedProcess.stdin.write(input + "\n");
-                    }
-                });
-
-                socket.on("disconnect", () => {
-                    console.log("User disconnected:", socket.id);
-                    spawnedProcess.kill("SIGINT");
-                    try {
-                        fs.unlinkSync(inputFilepath);
-                        fs.unlinkSync(outputFilepath + ".exe");
-                    } catch (error) {
-                        console.log(error);
                     }
                 });
 
             });
         });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+        if (spawnedProcess) {
+            spawnedProcess.kill("SIGINT");
+            spawnedProcess = null;
+        }
     });
 });
 
