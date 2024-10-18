@@ -1,7 +1,7 @@
 # Online C-Compiler
 
-Simple online compiler for C language using [Node.js](https://nodejs.org/en/).
-
+Simple online compiler for C language using [Node.js](https://nodejs.org/en/).<br>
+**Live demo:** [https://online-c-compiler.glitch.me/](https://online-c-compiler.glitch.me/)
 
 ## Quick Start
 
@@ -30,4 +30,4 @@ npm install
 ```bash
 npm run dev
 ```
-_This will start the app by default locally at 3000_;
+_This will start the app by default locally at 3000_.
