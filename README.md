@@ -1,6 +1,6 @@
 # Online C-Compiler
 
-Simple online compiler for C language using [Node.js](https://nodejs.org/en/).<br>
+Simple online compiler for C language using Node.js.<br>
 **Live demo:** [https://online-c-compiler.glitch.me/](https://online-c-compiler.glitch.me/)
 
 ## Quick Start
