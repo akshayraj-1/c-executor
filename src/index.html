@@ -114,31 +114,28 @@
         matchBrackets: true,
     });
 
-    editor.setValue(`#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!");\n\tfor(int i = 0; i < 10; i++) {\n\t\tprintf("%d\\n", i);\n\t}\n\tint x;\n\tscanf("%d", &x);\n\tprintf("x: %d", x);\n\t\n\tint y;\n\tscanf("%d", &y);\n\tprintf("y: %d", y);\n\treturn 0;\n}`);
-
+    // Loading default code -> (/data/default.c)
+    getDefaultCode();
 
     const socket = io();
     socket.on("connect", () => {
         console.log("Connected to websocket server");
     });
 
-
     btnRun.addEventListener("click", () => {
         const code = editor.getValue();
-
         // Resetting UI States
         changeButtonState(0);
         ioContainer.innerHTML = "";
 
         socket.off("output");
-        // Compile & Execute the code
         socket.emit("compile", code, (success, message) => {
-            insertOutputLine(message);
+            insertIOLine(message, "text-slate-400");
             changeButtonState(1);
         });
 
         socket.on("output", (data) => {
-            insertOutputLine(data);
+            insertIOLine(data);
         });
 
     });
@@ -146,15 +143,19 @@
     input.addEventListener("keyup", (e) => {
         if (e.key === "Enter" && e.target.value.toString().length > 0) {
             e.preventDefault();
-            insertOutputLine(e.target.value);
+            insertIOLine(e.target.value);
             socket.emit("userInput", e.target.value);
             e.target.value = "";
         }
     });
 
 
-    function insertOutputLine(data) {
-        ioContainer.innerHTML += `<p>${data}</p>`
+    function insertIOLine(data, ...classNames) {
+        if (classNames) {
+            ioContainer.innerHTML += `<p class="${classNames.join(" ")}">${data}</p>`
+        } else {
+            ioContainer.innerHTML += `<p>${data}</p>`
+        }
         input.focus();
     }
 
@@ -166,6 +167,12 @@
             btnRun.disabled = false;
             circularProgress.classList.toggle("hidden");
         }
+    }
+
+    async function getDefaultCode() {
+        const response = await fetch("/data/default.c");
+        const code = await response.text();
+        editor.setValue(code);
     }
 
 </script>
