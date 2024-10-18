@@ -60,6 +60,7 @@ io.on("connection", (socket) => {
                 });
 
                 socket.on("userInput", (input) => {
+                    console.log(input);
                     if (spawnedProcess.stdin) {
                         spawnedProcess.stdin.write(input + "\n");
                     }
@@ -87,6 +88,3 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-// TODO: Output is not streaming in real time, it waits until the program finishes
