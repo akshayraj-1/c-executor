@@ -114,7 +114,7 @@
         matchBrackets: true,
     });
 
-    editor.setValue(`#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!");\n\tfor(int i = 0; i < 10; i++) {\n\t\tprintf("%d\\n", i);\n\t}\n\tint x;\n\tscanf("%d", &x);\n\tprintf("%d", x);\n\treturn 0;\n}`);
+    editor.setValue(`#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!");\n\tfor(int i = 0; i < 10; i++) {\n\t\tprintf("%d\\n", i);\n\t}\n\tint x;\n\tscanf("%d", &x);\n\tprintf("x: %d", x);\n\t\n\tint y;\n\tscanf("%d", &y);\n\tprintf("y: %d", y);\n\treturn 0;\n}`);
 
 
     const socket = io();
