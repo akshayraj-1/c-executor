@@ -1,4 +1,4 @@
-const { exec,spawn } = require("child_process");
+const { exec, spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
@@ -13,19 +13,19 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e8,
 });
 
-app.use(express.static("public"));
-app.use(express.json());
-
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "src/index.html"));
 });
 
-io.on("connection", (socket) => {
-    console.log("User connected");
+app.get("/data/*" , (req, res) => {
+    res.sendFile(path.join(__dirname, req.url));
+});
 
+io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
     socket.on("compile", (code, cb) => {
 
-        const modifiedCode = code.replace(/(printf\(.*?\);)/g, '$1 fflush(stdout);')
+        const modifiedCode = code.replace(/(printf\(.*?\);|putchar\(.*?\);|puts\(.*?\);)/g, '$1 fflush(stdout);');
         console.log(modifiedCode);
 
         const filename = Math.random().toString(36).slice(2, 6);
@@ -46,17 +46,31 @@ io.on("connection", (socket) => {
                     return;
                 }
 
-                cb(true, "Compilation succeeded");
+                cb(true, inputFilepath.replaceAll(__dirname, ""));
 
                 // Execute the compiled code
                 const spawnedProcess = spawn(outputFilepath);
 
                 spawnedProcess.stdout.on("data", (data) => {
-                    socket.emit("output", data.toString() + "\n");
+                    socket.emit("output", data.toString());
                 });
 
                 spawnedProcess.stderr.on("data", (error) => {
-                    socket.emit("output", error.toString() + "\n");
+                    socket.emit("output", error.toString());
+                });
+
+                spawnedProcess.on("exit", (code) => {
+                    socket.emit("output",
+                        code !== 0
+                            ? `==== Program exited with code ${code} ====`
+                            :  `=== Program finished ====`
+                    );
+                    try {
+                        fs.unlinkSync(inputFilepath);
+                        fs.unlinkSync(outputFilepath + ".exe");
+                    } catch (error) {
+                        console.log(error);
+                    }
                 });
 
                 socket.on("userInput", (input) => {
@@ -66,12 +80,9 @@ io.on("connection", (socket) => {
                     }
                 });
 
-                spawnedProcess.on("exit", (code) => {
-                    if (code !== 0) {
-                        socket.emit("output", `==== Program exited with code ${code} ====`);
-                    } else {
-                        socket.emit("output", "==== Program finished ====");
-                    }
+                socket.on("disconnect", () => {
+                    console.log("User disconnected:", socket.id);
+                    spawnedProcess.kill("SIGINT");
                     try {
                         fs.unlinkSync(inputFilepath);
                         fs.unlinkSync(outputFilepath + ".exe");
