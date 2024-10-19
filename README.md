@@ -1,14 +1,15 @@
 # Online C-Compiler
 
 Simple online compiler for C language using Node.js.<br>
-**Live demo:** [https://online-c-compiler.glitch.me/](https://online-c-compiler.glitch.me/)
+**Check out the preview here:**
+[https://online-c-compiler.glitch.me/](https://online-c-compiler.glitch.me/)
 
 ## Quick Start
 
 Follow these steps to run the project locally.
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/en/download/) (version 14 or higher)
+- [Node.js](https://nodejs.org/en/download/) (version 15 or higher)
 - npm or yarn
 
 ### Installation
