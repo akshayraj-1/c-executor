@@ -2,7 +2,7 @@
 
 Simple online compiler for C language using Node.js.<br>
 **Check out the preview here:**
-[https://online-c-compiler.glitch.me/](https://online-c-compiler.glitch.me/)
+[https://akshayraj.io/urls/compiler](https://akshayraj.io/urls/compiler)
 
 ## Quick Start
 
