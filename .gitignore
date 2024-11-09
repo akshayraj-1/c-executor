@@ -2,3 +2,5 @@
 node_modules
 _push.ps1
 tmp/**
+.vercel
+vercel.json
