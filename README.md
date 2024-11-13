@@ -1,8 +1,8 @@
-# Online C-Compiler
+# Online C-Executor
 
-Simple online compiler for C language using Node.js.<br>
+Simple online executor for C language using Node.js.<br>
 **Check out the preview here:**
-[https://akshayraj.io/urls/compiler](https://akshayraj.io/urls/compiler)
+[https://akshayraj.io/urls/executor](https://akshayraj.io/urls/executor)
 
 ## Quick Start
 
@@ -16,8 +16,8 @@ Follow these steps to run the project locally.
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/akshayraj-1/online-c-compiler.git
-cd online-c-compiler
+git clone https://github.com/akshayraj-1/online-c-executor.git
+cd online-c-executor
 ```
 
 **2. Install dependencies**
