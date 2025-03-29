@@ -16,8 +16,8 @@ Follow these steps to run the project locally.
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/akshayraj-1/online-c-executor.git
-cd online-c-executor
+git clone https://github.com/akshayraj-1/c-executor.git
+cd c-executor
 ```
 
 **2. Install dependencies**
