@@ -1,4 +1,4 @@
-# Online C-Executor
+# C-Executor
 
 Simple online executor for C language using Node.js.<br>
 **Check out the preview here:**
