@@ -176,7 +176,7 @@
     }
 
     async function getDefaultCode() {
-        const response = await fetch("/data/default.c");
+        const response = await fetch("/default.c");
         const code = await response.text();
         editor.setValue(code);
     }

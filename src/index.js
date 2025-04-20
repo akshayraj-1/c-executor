@@ -13,12 +13,10 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e8,
 });
 
+app.use(express.static(path.join(__dirname, "../public")));
+
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.get("/data/*", (req, res) => {
-    res.sendFile(path.join(__dirname, req.url));
 });
 
 io.on("connection", (socket) => {
