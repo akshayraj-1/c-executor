@@ -1,8 +1,8 @@
-const { exec, spawn } = require("node:child_process");
-const path = require("node:path");
-const fs = require("node:fs");
+const { exec, spawn } = require("child_process");
+const path = require("path");
+const fs = require("fs");
 
-const http = require("node:http");
+const http = require("http");
 const express = require("express");
 const {Server} = require("socket.io");
 
