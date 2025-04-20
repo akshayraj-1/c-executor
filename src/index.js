@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
                     return;
                 }
 
-                cb(true, inputFilepath.toString().replace(__dirname, ''));
+                cb(true, "/" + inputFilepath.toString().slice(inputFilepath.lastIndexOf("\\") + 1));
 
                 // Execute the compiled code
                 spawnedProcess = spawn(outputFilepath);
@@ -74,8 +74,7 @@ io.on("connection", (socket) => {
                             : `=== Program finished ====`
                     );
                     try {
-                        fs.unlinkSync(inputFilepath);
-                        fs.unlinkSync(outputFilepath);
+                        fs.unlinkSync(outputFilepath + `${process.platform === "win32" ? ".exe" : ""}`);
                     } catch (error) {
                         console.log(error);
                     }
